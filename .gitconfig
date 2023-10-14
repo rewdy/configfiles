@@ -1,0 +1,48 @@
+[user]
+    name = Andrew Meyer
+    email = andrewmeyer@granular.ag
+[push]
+    followTags = true
+[init]
+    defaultBranch = master
+[alias]
+    am = add --all && commit
+    revert-to = diff HEAD $1 | git apply
+    # can be used in place of `git push` when only use remote named origin and prevents new branches needing to specify origin tracking
+    publish = !git push -u origin \"$(git rev-parse --abbrev-ref HEAD)\"
+[core]
+    pager = delta
+[interactive]
+    diffFilter = delta --color-only --features=interactive
+[delta]
+    features = decorations
+[color]
+    ui = true
+[color "diff-highlight"]
+    oldNormal = red bold
+    oldHighlight = red bold 52
+    newNormal = green bold
+    newHighlight = green bold 22
+[color "diff"]
+    meta = 11
+    frag = magenta bold
+    func = 146 bold
+    commit = yellow bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+[delta "interactive"]
+    keep-plus-minus-markers = false
+[delta "decorations"]
+    commit-decoration-style = blue ol
+    commit-style = raw
+    file-style = omit
+    hunk-header-decoration-style = blue box
+    hunk-header-file-style = red
+    hunk-header-line-number-style = "#067a00"
+    hunk-header-style = file line-number syntax
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
