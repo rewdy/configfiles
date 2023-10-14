@@ -32,9 +32,7 @@ others as needed.
 * A folder `shrcriles` that loads alphabetically. Recommend using numbers to control the order that files load. All files are meant to be modified and added to based on user's need or taste
   * [0-base.sh](shrcfiles/0-base.sh) contain your ONELOGIN USERNAME
   * [2-alias.sh](shrcfiles/2-alias.sh) contains some simple ls alias and functions
-  * [4-1-aws.sh](shrcfiles/4-1-aws.sh) contains tooling to allow for easy setting of `AWS_PROFILE` from onelogin cli tooling
-    * example: `aws-profile-developer granappdevelopment` to get the DeveloperSSO in granappdevelopment
-    * requires pipx installs of `onelogin-granular-cli` and `granularaccountmap` to function completely
+  * [4-1-aws.sh](shrcfiles/4-1-aws.sh) contains tooling to allow for easy setting of `AWS_PROFILE`.
   * [4-2-docker.sh](shrcfiles/4-2-docker.sh) contains alias for docker including ability to request arm vs intel containers and starting and stopping docker on a Mac from command line
   * [4-3-python.sh](shrcfiles/4-3-python.sh) contains shell setup for `direnv`, `pyenv`, `pyenv-virutalenv`, and `pipx`
   * [4-6-node.sh](shrcfiles/4-6-node.sh) sets up nvm
