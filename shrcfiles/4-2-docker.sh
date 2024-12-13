@@ -17,8 +17,16 @@ docker-noplatform() {
 ### DOCKER DAEMON
 #########################################################################
 docker-start() {
-    open -a Docker
+  open -a Docker
 }
 docker-stop() {
-    killall -9 Docker
+  killall -9 Docker
+}
+
+docker-stop-all() {
+  docker kill "$(docker ps -q)"
+}
+
+docker-teardown-all() {
+  docker rm "$(docker ps -a -q)"
 }

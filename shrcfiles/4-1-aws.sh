@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# TODO: Move all path stuff to the same place
-export PATH=$PATH:$HOME/.tfenv/bin
+export AWS_DEFAULT_REGION="us-east-1"
 
-#########################################################################
-### AWS HELPERS
-#########################################################################
-
-# TODO: Add personal stuff here...
+# function to add aws completions if installed
+aws-profile-none() {
+    unset AWS_DEFAULT_PROFILE
+    unset AWS_PROFILE
+}

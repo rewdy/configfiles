@@ -65,17 +65,17 @@ git-back-to-master() {
 					notify "Here we go...\n"
 					if [ $stash -eq 1 ]; then
 						git stash
-						notify-success "✅ Stashed changes...\n"
+						notify-success "Stashed changes...\n"
 					fi
 					git checkout "$master_branch"
-					notify-success "✅ Checked out $master_branch...\n"
+					notify-success "Checked out $master_branch...\n"
 					git pull
-					notify-success "✅ Pulled latest and greatest...\n"
+					notify-success "Pulled latest and greatest...\n"
 					git branch -D "$current_branch"
-					notify-success "✅ Working branch removed. All done.\n\n"
+					notify-success "Working branch removed. All done.\n\n"
 					if [ $stash -eq 1 ]; then
 						git stash apply
-						notify-success "✅ Applied stash...\n"
+						notify-success "Applied stash...\n"
 					fi
 				;;
 				* )
@@ -95,7 +95,7 @@ git-clear-branches() {
 		y|Y)
 			notify "kk..."
 			git branch | grep -v "master" | xargs git branch -D
-			notify-success "\n✅ Everything gone but master. I love you.\n"
+			notify-success "Everything gone but master. I love you.\n"
 		;;
 		* )
 			notify "🤷‍♀️ Okay. Not doing anything."

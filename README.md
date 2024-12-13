@@ -37,3 +37,9 @@ others as needed.
   * [4-3-python.sh](shrcfiles/4-3-python.sh) contains shell setup for `direnv`, `pyenv`, `pyenv-virutalenv`, and `pipx`
   * [4-6-node.sh](shrcfiles/4-6-node.sh) sets up nvm
   * [9-other.sh](shrcfiles/9-other.sh) whatever else you want :P
+
+## Optional Vim 🍬 Goodies (if that is your jam)
+
+* There are starting points for [.vimrc](.vimrc) and [.gitconfig](.gvimrc)
+  * Uncomment from the [install.sh](install.sh#L8-10) to symlink
+* A [./link-vim.sh](link-vim.sh) file that links MacVim installed vim files to /usr/local/bin

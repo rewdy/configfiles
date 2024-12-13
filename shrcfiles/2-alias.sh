@@ -5,25 +5,32 @@
 #########################################################################
 
 # Basic aliases
-alias ..='cd ../'               # Go up one directory
-alias ~='cd ~'                  # Go to home directory
-alias home='cd ~'               # Go to home directory
-alias cp='cp -Riv'              # Preferred 'cp' implementation: recusive, interactive, verbose
-alias untar="tar -zxvf"         # Shortcut for untarring
-cd() { builtin cd "$@" || exit 1; exa -hl --git; }   # List directory contents upon 'cd'
+alias ..='cd ../'       # Go up one directory
+alias ~='cd ~'          # Go to home directory
+alias home='cd ~'       # Go to home directory
+alias cp='cp -Rv'      # Preferred 'cp' implementation: recusive, interactive, verbose
+alias untar="tar -zxvf" # Shortcut for untarring
+cd() {
+  builtin cd "$@" || exit 1
+  eza -hl --git
+} # List directory contents upon 'cd'
 
 # Better file listings
-alias ls='exa'                  # replace ls with exa b/c it kicks ass
-alias ll='ls --git -hl --git'          # list files
-alias la='ls --git -hla --git'         # list all
+alias ls='eza'                 # replace ls with eza b/c it kicks ass
+alias ll='ls --git -hl --git'  # list files
+alias la='ls --git -hla --git' # list all
 
 # Git Shorties
-alias gs='git status'                     # Git Shorties
+alias gs='git status' # Git Shorties
 alias gaac="git add --all && git commit"
+alias grc="git rebase --continue"
 
 # Short version of other commands
-alias docc="docker-compose"
+alias docc="docker compose"
 alias tf="terraform"
+alias p="pnpm"
+alias y="yarn"
+alias gui="gitui"
 
 # App aliases
 alias edit="code"
@@ -31,6 +38,10 @@ alias lkl="lokalise2 --config ~/.config/lokalise/config.yml"
 
 # Clear DNS cache
 alias cleardnscache="sudo killall -HUP mDNSResponder"
+
+# GH Copilot
+alias ghs="gh copilot suggest"
+alias ghe="gh copilot explain"
 
 # unlock keychain
 # alias unlock-keychain='security -i unlock-keychain'

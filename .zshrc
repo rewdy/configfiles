@@ -3,24 +3,17 @@
 
 echo "⏳ Loading..."
 
-# Enable Powerlevel10k instant prompt
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
-# Setup brew env variables
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
-ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME=""
 COMPLETION_WAITING_DOTS="true"
 
 # Plugins
 plugins=(
   macos
   git
+  asdf
   zsh-autosuggestions
   zsh-syntax-highlighting
   z
@@ -29,23 +22,16 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+# 💅 Oh my posh
+posh_config="~/.configfiles/oh-my-posh-config.yml"
+eval "$(oh-my-posh init zsh --config $posh_config)"
+
 ##########################################
 ### USER CONFIG
 ##########################################
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# TODO: Do I need all this?? 
-# export PATH="$PATH:/Users/$USER/.local/bin"
-# export PATH="/usr/local/sbin:$PATH"
-# export PATH="$HOME/.poetry/bin:$PATH"
-# export LDFLAGS="-L/opt/homebrew/opt/icu4c/lib -L/opt/homebrew/opt/bzip2/lib -L/opt/homebrew/opt/zlib/lib"
-# export CPPFLAGS="-I/opt/homebrew/opt/icu4c/include -I/opt/homebrew/opt/bzip2/include -I/opt/homebrew/opt/zlib/include"
-# export LDFLAGS="$LDFLAGS -L/opt/homebrew/opt/openssl@3/lib"
-# export CPPFLAGS="$CPPFLAGS -I/opt/homebrew/opt/openssl@3/include"
-# export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig"
-
+# Setup brew env variables
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 #########################################################################
 ### ALLOW BASH STYLE COMPLETIONS
@@ -65,8 +51,17 @@ if [ -f "$HOME/.private-config.sh" ]; then
 fi
 
 # source files in the shrcfiles folder alphabetically
-for f in $(ls -v ~/.configfiles/shrcfiles/*.sh); do source $f; done
+config_timer=$(($(gdate +%s%N)/1000000))
+for f in $(ls -v ~/.configfiles/shrcfiles/*.sh); do
+  # timer=$(($(gdate +%s%N)/1000000))
+  source $f;
+  # now=$(($(gdate +%s%N)/1000000))
+  # elapsed=$(($now-$timer))
+  # echo $elapsed":" $f
+done
+config_end=$(($(gdate +%s%N)/1000000))
+config_elapsed=$(($config_end-$config_timer))
 
-# This is the last thing that runs. This Replaces any output that happens during 
+# This is the last thing that runs. This Replaces any output that happens during
 # start up with the ready indicator.
-echo -e "\033c👍 Ready"
+echo -e "\033c$(emoji) Let's go! \033[33m($config_elapsed ms)\033[0m"

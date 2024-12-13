@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
+version: 3
+schema: "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json"
+final_space: false
+console_title_template: "{{ .Folder }}"
+transient_prompt:
+  background: transparent
+  foreground: "darkGray"
+  template: &prompt "$ "
+blocks:
+  - type: prompt
+    alignment: left
+    newline: true
+    segments:
+      - type: status
+        style: plain
+        foreground: "default"
+        template: "---"
+        properties:
+          always_enabled: true
+  - type: "prompt"
+    alignment: "left"
+    newline: true
+    segments:
+      - type: "path"
+        style: "plain"
+        foreground: "blue"
+        template: "[ {{ .Path }} ]"
+        properties:
+          style: "unique"
+          home_icon: "󰋜 "
+          trailing_separator: false
+      - type: "git"
+        style: "plain"
+        foreground: "green"
+        properties:
+          fetch_status: true
+          branch_icon: " \uf126 "
+          branch_max_length: 20
+          branch_max_length_symbol: "…"
+      - type: "python"
+        style: "plain"
+        foreground: "cyan"
+        template: "  {{ .Full }} "
+      - type: "node"
+        style: "plain"
+        foreground: "yellow"
+        properties:
+          fetch_package_manager: true
+  - type: "prompt"
+    alignment: right
+    # filler: "-"
+    segments:
+      - type: "time"
+        style: "plain"
+        foreground: "default"
+        properties:
+          format: "HH:mm:ss"
+      - type: "aws"
+        style: "plain"
+        foreground: "yellow"
+        properties:
+          display_default: false
+      - type: upgrade
+        style: plain
+        foreground: "red"
+        properties:
+          cache_duration: 168h
+      - type: executiontime
+        style: "plain"
+        foreground: "darkGray"
+        properties:
+          threshold: 250
+          style: austin
+  - type: prompt
+    alignment: left
+    newline: true
+    segments:
+      - type: status
+        style: plain
+        foreground: "magenta"
+        foreground_templates:
+          - "{{ if gt .Code 0 }}#ef5350{{ end }}"
+        template: *prompt
+        properties:
+          always_enabled: true
