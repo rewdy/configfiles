@@ -16,5 +16,3 @@ if command -v pyenv &>/dev/null; then
   # eval "$(pyenv init - $SHELL)"
 fi
 
-# PIPX
-export PATH=/Users/$USER/.local/bin:$PATH # pipx

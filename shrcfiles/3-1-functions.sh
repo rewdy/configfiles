@@ -16,24 +16,24 @@ date-string() {
 # Output helpers
 define "notify" "Echos a notify message with styling"
 notify() {
-  clr_blue "  $1"
+  echo -e "\033[34m  $1\033[0m"
 }
 
 define "notify-start" "Notifies a process is starting"
 notify-start() {
   echo ""
-  clr_blueb "   $1 "
+  echo -e "\033[44m   $1 \033[0m"
   echo ""
 }
 
 define "notify-success" "Notifies a process has succeeded"
 notify-success() {
-  clr_green "  $1"
+  echo -e "\033[32m  $1\033[0m"
 }
 
 define "notify-fail" "Notifies a process has failed"
 notify-fail() {
-  clr_red "  $1"
+  echo -e "\033[31m  $1\033[0m"
 }
 
 define "newtab" "Tells iTerm to create a new tab"

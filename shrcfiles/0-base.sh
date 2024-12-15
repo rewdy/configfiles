@@ -3,10 +3,6 @@
 # for referencing other files in the config dir
 export CONFIG_ROOT="/Users/$USER/.configfiles"
 
-# This pulls in the color functions, bc 🌈😊
-# shellcheck source="../bash_colors/bash_colors.sh"
-source "$CONFIG_ROOT/bash_colors/bash_colors.sh"
-
 export PIPENV_VERBOSITY=-1
 
 # Composer memory limit

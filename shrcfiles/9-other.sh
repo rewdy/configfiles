@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #########################################################################
 ### OTHER RANDOM
 #########################################################################
@@ -29,5 +31,7 @@ function set_app_icons() {
     # fileicon set /Applications/iTerm.app "$CUSTOM_ICON_PATH/iTerm2-nord-chevron.icns"
     # Other applications could be set here...
     killall Dock
+  else
+    notify-fail "fileicon is not installed. Run 'brew install fileicon' to install."
   fi
 }
