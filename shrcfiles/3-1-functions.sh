@@ -211,8 +211,9 @@ vscode-colors() {
   else
     color="$1"
   fi
-  mkdir -p .vscode
-  cat <<EOT >>./.vscode/settings.json
+  if [ ! -f .vscode/settings.json ]; then
+    mkdir -p .vscode
+    cat <<EOT >>./.vscode/settings.json
 {
   "workbench.colorCustomizations": {
     "titleBar.activeBackground": "$color",
@@ -220,18 +221,32 @@ vscode-colors() {
   }
 }
 EOT
+  else
+    jq --arg color "$color" '."workbench.colorCustomizations"."titleBar.activeBackground" = $color | ."workbench.colorCustomizations"."titleBar.activeForeground" = "#f2f2f2"' .vscode/settings.json >.vscode/tmp_settings.json && mv .vscode/tmp_settings.json .vscode/settings.json
+  fi
   notify-success "VSCode Settings Created."
 }
 
-define "portcheck" "Checks what is running on a specified port"
-function portcheck() {
-  lsof -n -i :$@
+define "port-check" "Checks what is running on a specified port"
+function port-check() {
+  lsof -n -i :"$1"
+}
+
+define "spyware-log" "Logs all the spyware runners on machine"
+spyware-log() {
+  logfile="$HOME/spyware.txt"
+  rm "$logfile"
+  while true; do
+    echo "$(date)" >>logfile.txt
+    ps -eo pcpu,pid,user,args | ggrep -iP 'cyber|zscaler|falcon|lakeside|upm|tanium|wdavd' | ggrep -vP '0\.0' | grep -v "$USER" >>"$logfile"
+    sleep 3
+  done
 }
 
 # This kills everything on a port
 define "smackdown" "Kills everything on the specified port"
 function smackdown() {
-  lsof -n -i:$@ |
+  lsof -n -i:"$1" |
     grep LISTEN |
     awk '{ print $2 }' |
     uniq |
@@ -245,37 +260,57 @@ function timezsh() {
   for i in $(seq 1 2); do /usr/bin/time $shell -i -c exit; done
 }
 
-# this function plus completions is available in the configfiles repo
-define "init-python-dir" "Sets up a new python virutalenv in the current directory"
-init-python-dir() {
-  notify "Setting up python dir..."
-  local dirname
-  dirname=${PWD##*/}
-  pyenv virtualenv $1 ${dirname}
-  pyenv local ${dirname}
-  notify-success "✨ New virtual configured at $dirname!"
-  if [ -f requirements.txt ]; then
-    notify "requirements.txt found. installing dependencies..."
-    pip install -r requirements.txt
-  fi
-}
-
 define "cdo" "cds to the directory and opens it in vscode"
 cdo() {
   z "$1" || cd "$1" || exit 1
   code .
 }
 
-define "print-colors" "Prints a table of ANSI color codes"
+define "print-colors" "Prints a table of 16 ANSI color codes"
 print-colors() {
-    for i in {0..15}; do
-        # Print the color number and the corresponding color
-        printf "\e[48;5;${i}m %3d \e[0m " $i
-        # Print a newline after every 8 colors for better readability
-        if [ $(( (i + 1) % 8 )) -eq 0 ]; then
-            echo
-        fi
-    done
+  for i in {0..15}; do
+    # Print the color number and the corresponding color
+    printf "\e[48;5;${i}m %3d \e[0m " $i
+    # Print a newline after every 8 colors for better readability
+    if [ $(((i + 1) % 8)) -eq 0 ]; then
+      echo
+    fi
+  done
+}
+
+define "print-all-colors" "Prints a table of all 255 ANSI color codes"
+print-all-colors() {
+  echo -e "\n--- ANSI 16 colors\n"
+  for i in {0..255}; do
+    # Print the color number and the corresponding color
+    printf "\e[48;5;${i}m %3d \e[0m \e[38;5;${i}m %3d \e[0m " $i $i
+    # Print a newline after every 8 colors for better readability
+    if [ $(((i + 1) % 8)) -eq 0 ]; then
+      echo
+    fi
+
+    if ((i == 15)); then
+      echo -e "\n--- Other colors\n"
+    fi
+  done
+}
+
+define "colorize_time" "Colorizes the time output; higher times are bolder"
+colorize_time() {
+  local time=$1
+  if [ $time -lt 1000 ]; then
+    # show is gray b/c it's good and doesn't need attention.
+    echo -e "\e[1;30m($time ms)\033[0m"
+  elif [ $time -le 3000 ]; then
+    # show in yellow
+    echo -e "\033[33m($time ms)\033[0m"
+  elif [ $time -le 5000 ]; then
+    # show in red
+    echo -e "\033[31m($time ms)\033[0m"
+  else
+    # show in red background b/c it's BAD
+    echo -e "\033[41;37m $time ms \033[0m"
+  fi
 }
 
 define "config" "Opens up shell config in vs code"

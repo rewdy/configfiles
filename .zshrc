@@ -3,6 +3,9 @@
 
 echo "⏳ Loading..."
 
+# start timer
+config_start=$(($(gdate +%s%N) / 1000000))
+
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
@@ -22,16 +25,16 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# 💅 Oh my posh
-posh_config="~/.configfiles/oh-my-posh-config.yml"
-eval "$(oh-my-posh init zsh --config $posh_config)"
-
 ##########################################
 ### USER CONFIG
 ##########################################
 
-# Setup brew env variables
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# 💅 Oh my posh
+posh_config="~/.configfiles/oh-my-posh-config.yml"
+eval "$(oh-my-posh init zsh --config $posh_config)"
+
+# Atuin
+eval "$(atuin init zsh)"
 
 #########################################################################
 ### ALLOW BASH STYLE COMPLETIONS
@@ -51,17 +54,20 @@ if [ -f "$HOME/.private-config.sh" ]; then
 fi
 
 # source files in the shrcfiles folder alphabetically
-config_timer=$(($(gdate +%s%N)/1000000))
 for f in $(ls -v ~/.configfiles/shrcfiles/*.sh); do
-  # timer=$(($(gdate +%s%N)/1000000))
-  source $f;
-  # now=$(($(gdate +%s%N)/1000000))
-  # elapsed=$(($now-$timer))
+  # timer=$(($(gdate +%s%N) / 1000000))
+  source $f
+  # now=$(($(gdate +%s%N) / 1000000))
+  # elapsed=$(($now - $timer))
   # echo $elapsed":" $f
 done
+
 config_end=$(($(gdate +%s%N)/1000000))
-config_elapsed=$(($config_end-$config_timer))
+config_elapsed=$(($config_end-$config_start))
+
+elapsed=$(colorize_time $config_elapsed)
 
 # This is the last thing that runs. This Replaces any output that happens during
 # start up with the ready indicator.
-echo -e "\033c$(emoji) Let's go! \033[33m($config_elapsed ms)\033[0m"
+echo -e "\033c$(emoji) Let's go! $elapsed"
+# zprof

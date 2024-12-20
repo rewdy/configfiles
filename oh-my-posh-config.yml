@@ -35,7 +35,7 @@ blocks:
         foreground: "green"
         properties:
           fetch_status: true
-          branch_icon: " \uf126 "
+          branch_icon: "  "
           branch_max_length: 20
           branch_max_length_symbol: "…"
       - type: "python"
@@ -58,6 +58,7 @@ blocks:
           format: "HH:mm:ss"
       - type: "aws"
         style: "plain"
+        template: ☁️ {{ .Profile }}{{if not (matchP "us-east-1" .Region)}} <cyan>[🛫 {{ .Region }}]</>{{ end }}
         foreground: "yellow"
         properties:
           display_default: false
@@ -80,7 +81,7 @@ blocks:
         style: plain
         foreground: "magenta"
         foreground_templates:
-          - "{{ if gt .Code 0 }}#ef5350{{ end }}"
+          - "{{ if gt .Code 0 }}red{{ end }}"
         template: *prompt
         properties:
           always_enabled: true

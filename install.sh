@@ -3,6 +3,7 @@
 cd "$(dirname "$0")" || exit 1
 
 to_install=(
+  atuin
   eza
   fileicon
   git-delta
