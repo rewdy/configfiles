@@ -1,10 +1,10 @@
 # NOTE: I've removed most of the comments here. To see the original default .zshrc take a
 # peek here: https://github.com/ohmyzsh/ohmyzsh/blob/master/templates/zshrc.zsh-template
+# zmodload zsh/zprof
 
 echo "⏳ Loading..."
-
-# start timer
-config_start=$(($(gdate +%s%N) / 1000000))
+# source files in the shrcfiles folder alphabetically
+config_start=$(($(gdate +%s%N)/1000000))
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
@@ -30,10 +30,14 @@ source $ZSH/oh-my-zsh.sh
 ##########################################
 
 # 💅 Oh my posh
-posh_config="~/.configfiles/oh-my-posh-config.yml"
-eval "$(oh-my-posh init zsh --config $posh_config)"
+# posh_config="~/.configfiles/oh-my-posh-config.yml"
+# eval "$(oh-my-posh init zsh --config $posh_config)"
 
-# Atuin
+# 🚀✨ Starship
+export STARSHIP_CONFIG=~/.configfiles/starship.toml
+eval "$(starship init zsh)"
+
+# Spin up atuin
 eval "$(atuin init zsh)"
 
 #########################################################################
@@ -53,12 +57,11 @@ if [ -f "$HOME/.private-config.sh" ]; then
   source "$HOME/.private-config.sh"
 fi
 
-# source files in the shrcfiles folder alphabetically
 for f in $(ls -v ~/.configfiles/shrcfiles/*.sh); do
-  # timer=$(($(gdate +%s%N) / 1000000))
-  source $f
-  # now=$(($(gdate +%s%N) / 1000000))
-  # elapsed=$(($now - $timer))
+  # timer=$(($(gdate +%s%N)/1000000))
+  source $f;
+  # now=$(($(gdate +%s%N)/1000000))
+  # elapsed=$(($now-$timer))
   # echo $elapsed":" $f
 done
 

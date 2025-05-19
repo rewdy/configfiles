@@ -13,6 +13,14 @@ date-string() {
   date "+%Y%m%d-%H%M%S"
 }
 
+define "get-uuid" "Generates a UUID4 and copies it to clipboard"
+get-uuid() {
+  uuid=$(uuidgen)
+  uuid=$(echo "$uuid" | tr '[:upper:]' '[:lower:]')
+  echo -n "$uuid" | pbcopy
+  notify "UUID copied to clipboard: $uuid"
+}
+
 # Output helpers
 define "notify" "Echos a notify message with styling"
 notify() {
@@ -324,9 +332,6 @@ source-config() {
 }
 
 alias refresh=source-config
-
-define "trash" "Moves a file to the trash"
-trash() { mv -fv "$@" ~/.Trash/; }
 
 define "cert-issue" "Checks to see if a site has a valid SSL cert"
 cert-issue() {

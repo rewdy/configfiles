@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #########################################################################
 ### OTHER RANDOM
 #########################################################################
@@ -8,11 +6,6 @@
 bindkey -e
 bindkey '[C' forward-word
 bindkey '[D' backward-word
-
-# DIRENV
-if command -v direnv &>/dev/null; then
-  eval "$(direnv hook $SHELL)"
-fi
 
 # Random emoji generator!!
 emoji_list=(🚀 🌟 ⛵️ 👻 👖 🌈 🔥 🍕 🌮 🍭 🍬 🍩 ⛳️ 🎯 🛵 🛫 🪭 💙 🤍 ❤️‍🔥 📣 🫦 🧠 💁‍♀️ 👓 🦑)
@@ -25,13 +18,16 @@ CUSTOM_ICON_PATH="$CONFIG_ROOT/custom-app-icons/"
 # Set custom app icons
 # NOTE: This is not run automatically. It's just here to run manually after the app(s)
 # are updated and icons reset.
-function set_app_icons() {
+function set-app-icons() {
   if command -v fileicon &>/dev/null; then
     fileicon set /Applications/iTerm.app "$CUSTOM_ICON_PATH/iTerm2-white-chevron.icns"
     # fileicon set /Applications/iTerm.app "$CUSTOM_ICON_PATH/iTerm2-nord-chevron.icns"
     # Other applications could be set here...
     killall Dock
-  else
-    notify-fail "fileicon is not installed. Run 'brew install fileicon' to install."
   fi
 }
+
+# Insights Login Aliases
+alias insights-login-dev='insights-login > /dev/null && source ~/.insights_creds_dev'
+alias insights-login-test='insights-login --env test > /dev/null && source ~/.insights_creds_test'
+alias insights-login-prod='insights-login --env prod > /dev/null && source ~/.insights_creds_prod'

@@ -5,11 +5,12 @@
 #########################################################################
 
 # Basic aliases
-alias ..='cd ../'       # Go up one directory
-alias ~='cd ~'          # Go to home directory
-alias home='cd ~'       # Go to home directory
-alias cp='cp -Rv'      # Preferred 'cp' implementation: recusive, interactive, verbose
-alias untar="tar -zxvf" # Shortcut for untarring
+alias ..='cd ../'           # Go up one directory
+alias ~='cd ~'              # Go to home directory
+alias home='cd ~'           # Go to home directory
+alias work='cd ~/Workspace' # Go to work directory
+alias cp='cp -Rv'           # Preferred 'cp' implementation: recusive, interactive, verbose
+alias untar="tar -zxvf"     # Shortcut for untarring
 cd() {
   builtin cd "$@" || exit 1
   eza -hl --git
@@ -34,7 +35,6 @@ alias gui="gitui"
 
 # App aliases
 alias edit="code"
-alias lkl="lokalise2 --config ~/.config/lokalise/config.yml"
 
 # Clear DNS cache
 alias cleardnscache="sudo killall -HUP mDNSResponder"
@@ -42,6 +42,3 @@ alias cleardnscache="sudo killall -HUP mDNSResponder"
 # GH Copilot
 alias ghs="gh copilot suggest"
 alias ghe="gh copilot explain"
-
-# unlock keychain
-# alias unlock-keychain='security -i unlock-keychain'

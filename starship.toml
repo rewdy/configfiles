@@ -1,0 +1,81 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = true
+
+# Replace the '❯' symbol in the prompt with '➜'
+[character] # The name of the module we are configuring is 'character'
+success_symbol = '✨ ' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
+
+# Icon overrides
+
+[aws]
+style = "#F89400"
+symbol = "  "
+
+[aws.profile_aliases]
+"granappdevelopment/Developer" = 'gad/dev'
+"granappdevelopment/ReadOnly" = 'gad/read'
+"granapptest/ReadOnly" = 'gat/read'
+"granapptest/Maintenance" = 'gat/maintenance'
+"granappproduction/ReadOnly" = 'gap/read'
+"granappproduction/Maintenance" = 'gap/maintenance'
+
+[cmake]
+symbol = " "
+
+[dart]
+symbol = " "
+
+[directory]
+style = "blue"
+format = '\[ [$path]($style)[$read_only]($read_only_style) \] '
+truncation_symbol = "…/"
+home_symbol = " "
+read_only = " 󰌾"
+
+[docker_context]
+symbol = " "
+
+[git_status]
+style = "bold #F44D27"
+
+[git_branch]
+style = "green"
+symbol = " "
+truncation_length = 16
+
+[git_commit]
+tag_symbol = '  '
+
+[golang]
+symbol = " "
+
+[hostname]
+ssh_symbol = " "
+
+[kotlin]
+symbol = " "
+
+[memory_usage]
+symbol = "󰍛 "
+
+[nodejs]
+style = "yellow"
+symbol = " "
+
+[package]
+symbol = "󰏗 "
+
+[perl]
+symbol = " "
+
+[php]
+symbol = " "
+
+[swift]
+symbol = " "
+
+[zig]
+symbol = " "
