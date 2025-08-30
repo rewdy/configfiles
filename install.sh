@@ -3,17 +3,15 @@
 cd "$(dirname "$0")" || exit 1
 
 to_install=(
+  # oh-my-posh
   atuin
   coreutils
   eza
+  ffmpeg
   fileicon
   git-delta
-  oh-my-posh
-)
-
-optional_to_install=(
-  ffmpeg
   mise
+  starship
 )
 
 echo -e "GREETINGS!\n\nThis install has two steps: \033[35m1.) Install Homebrew packages\033[0m, and \033[36m2.) Link dotfiles\033[0m.\n"
@@ -47,10 +45,7 @@ files_to_link=(
   .tool-versions
   .gitconfig
   .gitignore_global
-  .p10k.zsh
-  .vimrc
   .zshrc
-  .netrc
 )
 echo -e "\nStep 2: Link dotfiles\n"
 echo -e "The following files will be linked to your home directory:\n"
