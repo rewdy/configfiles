@@ -6,76 +6,26 @@ add_newline = true
 
 # Replace the '❯' symbol in the prompt with '➜'
 [character] # The name of the module we are configuring is 'character'
-success_symbol = '✨ ' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
+success_symbol = '[➤](bold green)' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
 
-# Icon overrides
+# Disable the package module, hiding it from the prompt completely
+# [package]
+# disabled = true
 
 [aws]
-style = "#F89400"
-symbol = "  "
-
-[aws.profile_aliases]
-"granappdevelopment/Developer" = 'gad/dev'
-"granappdevelopment/ReadOnly" = 'gad/read'
-"granapptest/ReadOnly" = 'gat/read'
-"granapptest/Maintenance" = 'gat/maintenance'
-"granappproduction/ReadOnly" = 'gap/read'
-"granappproduction/Maintenance" = 'gap/maintenance'
-
-[cmake]
-symbol = " "
-
-[dart]
-symbol = " "
-
-[directory]
-style = "blue"
-format = '\[ [$path]($style)[$read_only]($read_only_style) \] '
-truncation_symbol = "…/"
-home_symbol = " "
-read_only = " 󰌾"
-
-[docker_context]
-symbol = " "
-
-[git_status]
-style = "bold #F44D27"
+style = "#F89500"
+symbol = " "
 
 [git_branch]
-style = "green"
 symbol = " "
-truncation_length = 16
+style = "bold fg:27"
 
-[git_commit]
-tag_symbol = '  '
+[git_status]
+modified = "Δ"
 
-[golang]
-symbol = " "
-
-[hostname]
-ssh_symbol = " "
-
-[kotlin]
-symbol = " "
-
-[memory_usage]
-symbol = "󰍛 "
-
-[nodejs]
-style = "yellow"
-symbol = " "
-
-[package]
-symbol = "󰏗 "
-
-[perl]
-symbol = " "
-
-[php]
-symbol = " "
-
-[swift]
-symbol = " "
-
-[zig]
-symbol = " "
+[directory]
+style = "cyan"
+format = '\[ [$path]($style)[$read_only]($read_only_style) \] '
+home_symbol = " "
+truncation_symbol = "…/"
+before_repo_root_style = "fg:6"

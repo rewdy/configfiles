@@ -16,7 +16,8 @@ COMPLETION_WAITING_DOTS="true"
 plugins=(
   macos
   git
-  asdf
+  # asdf
+  mise
   zsh-autosuggestions
   zsh-syntax-highlighting
   z
@@ -34,7 +35,7 @@ source $ZSH/oh-my-zsh.sh
 # eval "$(oh-my-posh init zsh --config $posh_config)"
 
 # 🚀✨ Starship
-export STARSHIP_CONFIG=~/.configfiles/starship.toml
+export STARSHIP_CONFIG="$HOME/.configfiles/starship.toml"
 eval "$(starship init zsh)"
 
 # Spin up atuin

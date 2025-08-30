@@ -24,8 +24,8 @@ blocks:
     segments:
       - type: "path"
         style: "plain"
-        foreground: "blue"
-        template: "[ {{ .Path }} ]"
+        foreground: "default"
+        template: "<blue>{{ .Path }}</> "
         properties:
           style: "unique"
           home_icon: "󰋜 "

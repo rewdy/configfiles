@@ -180,9 +180,15 @@ define "make-nerd-font" "Patches a ttf file to create a nerd font"
 make-nerd-font() {
   if [ -s "$1" ]; then
     patched_dir="$PWD/$1 Patched"
-    docker_patcher_img="nerdfonts/patcher"
+    docker_patcher_img="ghcr.io/cdalvaro/docker-nerd-fonts-patcher:latest"
     mkdir "$patched_dir"
-    docker run --rm -v "$PWD/$1":/in:Z -v "$patched_dir":/out:Z $docker_patcher_img
+    # docker run --rm -v "$PWD/$1":/in:Z -v "$patched_dir":/out:Z $docker_patcher_img
+    docker run --rm \
+      --volume "$PWD/$1":/input \
+      --volume "$patched_dir":/output \
+      --env PUID=$(id -u) --env PGID=$(id -g) \
+      $docker_patcher_img \
+      --quiet --no-progressbars --complete --careful
   else
     notify-fail "Please provide a path to a directory containing .ttf files!"
     return 1
@@ -324,6 +330,13 @@ colorize_time() {
 define "config" "Opens up shell config in vs code"
 config() {
   code ~/.configfiles
+}
+
+define "get-uuid" "Generates a UUID and adds to clipboard"
+get-uuid() {
+  uuid=$(uuidgen | tr '[:upper:]' '[:lower:]')
+  echo -n "$uuid" | pbcopy
+  notify-success "UUID copied to clipboard ($uuid)!"
 }
 
 define "source-config" "Reloads the zsh config"
