@@ -1,6 +1,6 @@
-#########################################################################
-### OTHER RANDOM
-#########################################################################
+############################################################
+# OTHER RANDOM STUFF
+############################################################
 
 # This makes it so alt-left and alt-right will move the cursor by word in the terminal.
 bindkey -e
@@ -10,7 +10,7 @@ bindkey '[D' backward-word
 # Random emoji generator!!
 emoji_list=(🚀 🌟 ⛵️ 👻 👖 🌈 🔥 🍕 🌮 🍭 🍬 🍩 ⛳️ 🎯 🛵 🛫 🪭 💙 🤍 ❤️‍🔥 📣 🫦 🧠 💁‍♀️ 👓 🦑)
 function emoji() {
-  echo "${emoji_list[ $RANDOM % ${#emoji_list[@]} ]}"
+  echo "${emoji_list[$RANDOM % ${#emoji_list[@]}]}"
 }
 
 CUSTOM_ICON_PATH="$CONFIG_ROOT/custom-app-icons/"
@@ -26,8 +26,3 @@ function set-app-icons() {
     killall Dock
   fi
 }
-
-# Insights Login Aliases
-alias insights-login-dev='insights-login > /dev/null && source ~/.insights_creds_dev'
-alias insights-login-test='insights-login --env test > /dev/null && source ~/.insights_creds_test'
-alias insights-login-prod='insights-login --env prod > /dev/null && source ~/.insights_creds_prod'

@@ -1,4 +1,6 @@
-#!/bin/bash
+############################################################
+# Helper functions
+############################################################
 
 usage=("")
 usage+=("👋 Helper Functions:")
@@ -7,6 +9,55 @@ usage+=("-------\n\n")
 define() {
   usage+=("    \033[33m$1\033[0m~$2")
 }
+
+#
+# Output helpers
+#
+
+define "notify" "Echos a notify message with styling"
+notify() {
+  echo -e "\033[34m  $1\033[0m"
+}
+
+# Little var that can be set to make the notify start text dark. It is displayed on top of
+# the blue color and sometimes white text is unreadable based on the theme.
+NOTIFY_TEXT_DARK=1
+
+define "notify-start" "Notifies a process is starting"
+notify-start() {
+  text_style="\033[44m"
+  if [ "$NOTIFY_TEXT_DARK" -eq 1 ]; then
+    text_style="\033[44;30m"
+  fi
+  echo ""
+  echo -e "${text_style}   $1 \033[0m"
+  echo ""
+}
+
+define "notify-success" "Notifies a process has succeeded"
+notify-success() {
+  echo -e "\033[32m  $1\033[0m"
+}
+
+define "notify-warning" "Notifies with a warning"
+notify-warning() {
+  echo -e "\033[33m  $1\033[0m"
+}
+alias notify-warn=notify-warning
+
+define "notify-fail" "Notifies a process has failed"
+notify-fail() {
+  echo -e "\033[31m  $1\033[0m"
+}
+
+define "notify-calm" "Notifies with a calm message"
+notify-calm() {
+  echo -e "\033[1;30m$1\033[0m"
+}
+
+#
+# String generation
+#
 
 define "date-string" "Generates a datestring; can be used to generate timestamps"
 date-string() {
@@ -21,33 +72,51 @@ get-uuid() {
   notify "UUID copied to clipboard: $uuid"
 }
 
-# Output helpers
-define "notify" "Echos a notify message with styling"
-notify() {
-  echo -e "\033[34m  $1\033[0m"
-}
+#
+# Utilities
+#
 
-define "notify-start" "Notifies a process is starting"
-notify-start() {
-  echo ""
-  echo -e "\033[44m   $1 \033[0m"
-  echo ""
-}
-
-define "notify-success" "Notifies a process has succeeded"
-notify-success() {
-  echo -e "\033[32m  $1\033[0m"
-}
-
-define "notify-fail" "Notifies a process has failed"
-notify-fail() {
-  echo -e "\033[31m  $1\033[0m"
+define "toggle-dark" "Toggles on or off MacOS dark mode"
+toggle-dark() {
+  osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'
 }
 
 define "newtab" "Tells iTerm to create a new tab"
 newtab() {
   osascript -e 'tell application "iTerm" to activate' -e 'tell application "System Events" to tell process "iTerm" to keystroke "t" using command down'
 }
+
+define "toggle-stage-manager" "Turns on or off MacOS Stage Manager"
+toggle-stage-manager() {
+  enabled=$(defaults read com.apple.WindowManager GloballyEnabled)
+  newValue=1
+  case "$enabled" in
+  "0")
+    notify "Stage manager is currently disabled. Enabling..."
+    ;;
+  *)
+    notify "Stage manager is enabled. Disabling..."
+    newValue=0
+    ;;
+  esac
+  defaults write com.apple.WindowManager GloballyEnabled -int $newValue
+  notify-success "Done."
+}
+
+define "code-repo" "Opens the root of the current git repo in VSCode"
+code-repo() {
+  # Check if we're in a git repo
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    # Get the root of the git repo
+    repo_root=$(git rev-parse --show-toplevel)
+    code "$repo_root"
+  else
+    notify-warn "Not inside a git repository; will open where you are."
+    code .
+  fi
+}
+define "coder" "alias for code-repo"
+alias coder=code-repo
 
 define "py-path" "Sets the PYTHONPATH env var to the current path"
 py-path() {
@@ -56,10 +125,52 @@ py-path() {
   notify "PYTHONPATH is now ${PYTHONPATH}"
 }
 
-define "toggle-dark" "Toggles on or off MacOS dark mode"
-toggle-dark() {
-  osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'
+define "port-check" "Checks what is running on a specified port"
+function port-check() {
+  lsof -n -i :"$1"
 }
+
+define "spyware-log" "Logs all the spyware runners on machine"
+spyware-log() {
+  logfile="$HOME/spyware.txt"
+  rm "$logfile"
+  while true; do
+    echo "$(date)" >>logfile.txt
+    ps -eo pcpu,pid,user,args | ggrep -iP 'cyber|zscaler|falcon|lakeside|upm|tanium|wdavd' | ggrep -vP '0\.0' | grep -v "$USER" >>"$logfile"
+    sleep 3
+  done
+}
+
+# This kills everything on a port
+define "smackdown" "Kills everything on the specified port"
+function smackdown() {
+  lsof -n -i:"$1" |
+    grep LISTEN |
+    awk '{ print $2 }' |
+    uniq |
+    xargs -r kill -9
+}
+
+# Helper function to check how long it takes shell to load
+define "timezsh" "Helper function to see how long it takes z shell to load"
+function timezsh() {
+  shell=${1-$SHELL}
+  for i in $(seq 1 2); do /usr/bin/time $shell -i -c exit; done
+}
+
+define "cert-issue" "Checks to see if a site has a valid SSL cert"
+cert-issue() {
+  echo | openssl s_client -servername $1 -connect $1:443 2>/dev/null | openssl x509 -noout -issuer
+}
+
+define "cert-info" "Checks to get info on a cert"
+cert-info() {
+  echo | openssl s_client -servername $1 -connect $1:443 2>/dev/null | openssl x509 -noout -text
+}
+
+#
+# Scripts (basically)
+#
 
 define "bonvoyage" "Create a new bon voyage static website project" "https://github.com/rewdy/bonvoyage"
 bonvoyage() {
@@ -80,24 +191,6 @@ bonvoyage() {
   notify "🎗 Reminder: Before running browsersync, be sure to update the proxy setting in Gruntfile.js."
 }
 
-define "toggle-stage-manager" "Turns on or off MacOS Stage Manager"
-toggle-stage-manager() {
-  enabled=$(defaults read com.apple.WindowManager GloballyEnabled)
-  newValue=1
-  case "$enabled" in
-  "0")
-    notify "Stage manager is currently disabled. Enabling..."
-    ;;
-  *)
-    notify "Stage manager is enabled. Disabling..."
-    newValue=0
-    ;;
-  esac
-  defaults write com.apple.WindowManager GloballyEnabled -int $newValue
-  notify-success "Done."
-}
-
-# Make a mp4 from a mov
 define "movtomp4" "Creates an .mp4 file from a .mov file"
 movtomp4() {
   ending='.mp4'
@@ -158,64 +251,17 @@ data-encode-img() {
   notify-success "Image encoded and copied to clipboard!"
 }
 
-define "node-project-copy" "Copies a node project, excluding node_module, dist, build, .cache, and .yarn dirs"
-node-project-copy() {
-  # Function to copy a node-based project. Excludes node_modules.
-  rsync -rav --exclude=node_modules --exclude=dist --exclude=build --exclude=.cache --exclude=.yarn --exclude=qmk "$1" "$2"
-}
-define "ncp" "alias of node-project-copy"
-alias ncp="node-project-copy"
-
-define "yarn-clean-reinstall" "Removes node_modules and yarn.lock then reinstalls dependencies"
-yarn-clean-reinstall() {
-  notify-start "🧹 Removing node_modules and yarn.lock, reinstalling"
-  rm -rf node_modules yarn.lock
-  yarn install
-  notify-success "🎉 Done."
-}
-define "ycri" "alias of yarn-clean-reinstall"
-alias ycri=yarn-clean-reinstall
-
 define "make-nerd-font" "Patches a ttf file to create a nerd font"
 make-nerd-font() {
   if [ -s "$1" ]; then
     patched_dir="$PWD/$1 Patched"
-    docker_patcher_img="ghcr.io/cdalvaro/docker-nerd-fonts-patcher:latest"
+    docker_patcher_img="nerdfonts/patcher"
     mkdir "$patched_dir"
-    # docker run --rm -v "$PWD/$1":/in:Z -v "$patched_dir":/out:Z $docker_patcher_img
-    docker run --rm \
-      --volume "$PWD/$1":/input \
-      --volume "$patched_dir":/output \
-      --env PUID=$(id -u) --env PGID=$(id -g) \
-      $docker_patcher_img \
-      --quiet --no-progressbars --complete --careful
+    docker run --rm -v "$PWD/$1":/in:Z -v "$patched_dir":/out:Z $docker_patcher_img
   else
     notify-fail "Please provide a path to a directory containing .ttf files!"
     return 1
   fi
-}
-
-define "yarn-add-resolution" "Adds a resolution to package.json, yarn style."
-yarn-add-resolution() {
-  if [ "$#" -eq 0 ]; then
-    notify-fail "Please provide at least one package name and version in the format package@version"
-    return 1
-  fi
-
-  notify-start "🔏 Adding resolutions to package.json"
-
-  for pkg in "$@"; do
-    if [[ "$pkg" != *@* ]]; then
-      notify-fail "Invalid format for $pkg. Please provide in the format package@version"
-      return 1
-    fi
-
-    package_name="${pkg%@*}"
-    version="${pkg#*@}"
-    jq --arg pkg "$package_name" --arg ver "$version" '.resolutions[$pkg] = $ver' package.json >tmp.$$.json && mv tmp.$$.json package.json
-  done
-
-  notify-success "🎉 Done."
 }
 
 define "vscode-colors" "Creates a .vscode settings file and sets the window bar to a random color (or you can pass a hex color code of your choice)"
@@ -241,44 +287,133 @@ EOT
   notify-success "VSCode Settings Created."
 }
 
-define "port-check" "Checks what is running on a specified port"
-function port-check() {
-  lsof -n -i :"$1"
-}
-
-define "spyware-log" "Logs all the spyware runners on machine"
-spyware-log() {
-  logfile="$HOME/spyware.txt"
-  rm "$logfile"
-  while true; do
-    echo "$(date)" >>logfile.txt
-    ps -eo pcpu,pid,user,args | ggrep -iP 'cyber|zscaler|falcon|lakeside|upm|tanium|wdavd' | ggrep -vP '0\.0' | grep -v "$USER" >>"$logfile"
-    sleep 3
-  done
-}
-
-# This kills everything on a port
-define "smackdown" "Kills everything on the specified port"
-function smackdown() {
-  lsof -n -i:"$1" |
-    grep LISTEN |
-    awk '{ print $2 }' |
-    uniq |
-    xargs -r kill -9
-}
-
-# Helper function to check how long it takes shell to load
-define "timezsh" "Helper function to see how long it takes z shell to load"
-function timezsh() {
-  shell=${1-$SHELL}
-  for i in $(seq 1 2); do /usr/bin/time $shell -i -c exit; done
-}
-
 define "cdo" "cds to the directory and opens it in vscode"
 cdo() {
   z "$1" || cd "$1" || exit 1
   code .
 }
+
+define "add-changelog-entry" "Adds a changelog entry to CHANGELOG.md"
+add-changelog-entry() {
+  # Parse flags
+  local commit_flag=false
+  local entry_text=""
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      -c|--commit)
+        commit_flag=true
+        shift
+        ;;
+      *)
+        entry_text="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Check for entry argument
+  if [ -z "$entry_text" ]; then
+    notify-fail "Please provide a changelog entry!"
+    return 1
+  fi
+  potential_changelog_files=("CHANGELOG.md" "API_CLIENT_CHANGELOG.md")
+  # Check for changelog file
+  local changelog_file=""
+  for file in "${potential_changelog_files[@]}"; do
+    if [ -f "$file" ]; then
+      changelog_file="$file"
+      break
+    fi
+  done
+
+  if [ -z "$changelog_file" ]; then
+    notify-fail "No changelog file found in current directory! Looked for: ${potential_changelog_files[*]}"
+    return 1
+  fi
+
+  # Determine next version
+  current_highest_version=$(grep -Eo '## \[[0-9]+\.[0-9]+\.[0-9]+' "$changelog_file" | head -1 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+  if [ -z "$current_highest_version" ]; then
+    notify-fail "Could not determine current highest version from $changelog_file!"
+    return 1
+  fi
+  echo ""  # blank line
+  new_version=$(echo $current_highest_version | awk -F. -v OFS=. '{$3++;print}')
+  notify "Will update: \033[37m$current_highest_version -> $new_version\033[0m"
+  read -r -d '' entry << EOF
+## [$new_version] - $(date "+%Y-%m-%d")
+
+- $entry_text
+EOF
+
+  echo -e "\nAdding entry:"
+  echo -e "\033[33m\n...\n$entry\n...\n\033[0m"
+
+  # Insert entry after the ## [Unreleased] line
+  sed -i.bak "/## \[Unreleased\]/r /dev/stdin" "$changelog_file" <<<$'\n'"$entry"
+  rm "${changelog_file}.bak"
+  notify-success "Changelog updated."
+
+  # Commit if flag is set
+  if [ "$commit_flag" = true ]; then
+    git add "$changelog_file"
+    git commit -m "Added changelog entry"
+    notify-success "Committed changelog entry."
+  fi
+}
+
+define "ace" "Alias for add-changelog-entry"
+alias ace=add-changelog-entry
+
+#
+# Node utils
+#
+
+define "node-project-copy" "Copies a node project, excluding node_module, dist, build, .cache, and .yarn dirs"
+node-project-copy() {
+  # Function to copy a node-based project. Excludes node_modules.
+  rsync -rav --exclude=node_modules --exclude=dist --exclude=build --exclude=.cache --exclude=.yarn --exclude=qmk "$1" "$2"
+}
+define "ncp" "alias of node-project-copy"
+alias ncp="node-project-copy"
+
+define "yarn-clean-reinstall" "Removes node_modules and yarn.lock then reinstalls dependencies"
+yarn-clean-reinstall() {
+  notify-start "🧹 Removing node_modules and yarn.lock, reinstalling"
+  rm -rf node_modules yarn.lock
+  yarn install
+  notify-success "🎉 Done."
+}
+define "ycri" "alias of yarn-clean-reinstall"
+alias ycri=yarn-clean-reinstall
+
+define "yarn-add-resolution" "Adds a resolution to package.json, yarn style."
+yarn-add-resolution() {
+  if [ "$#" -eq 0 ]; then
+    notify-fail "Please provide at least one package name and version in the format package@version"
+    return 1
+  fi
+
+  notify-start "🔏 Adding resolutions to package.json"
+
+  for pkg in "$@"; do
+    if [[ "$pkg" != *@* ]]; then
+      notify-fail "Invalid format for $pkg. Please provide in the format package@version"
+      return 1
+    fi
+
+    package_name="${pkg%@*}"
+    version="${pkg#*@}"
+    jq --arg pkg "$package_name" --arg ver "$version" '.resolutions[$pkg] = $ver' package.json >tmp.$$.json && mv tmp.$$.json package.json
+  done
+
+  notify-success "🎉 Done."
+}
+
+#
+# Colors
+#
 
 define "print-colors" "Prints a table of 16 ANSI color codes"
 print-colors() {
@@ -309,8 +444,8 @@ print-all-colors() {
   done
 }
 
-define "colorize_time" "Colorizes the time output; higher times are bolder"
-colorize_time() {
+define "colorize-time" "Colorizes the time output; higher times are bolder"
+colorize-time() {
   local time=$1
   if [ $time -lt 1000 ]; then
     # show is gray b/c it's good and doesn't need attention.
@@ -327,34 +462,25 @@ colorize_time() {
   fi
 }
 
+#
+# Config utils
+#
+
 define "config" "Opens up shell config in vs code"
 config() {
   code ~/.configfiles
 }
 
-define "get-uuid" "Generates a UUID and adds to clipboard"
-get-uuid() {
-  uuid=$(uuidgen | tr '[:upper:]' '[:lower:]')
-  echo -n "$uuid" | pbcopy
-  notify-success "UUID copied to clipboard ($uuid)!"
+define "config-dir" "Changes directory to shell config files"
+config-dir() {
+  cd ~/.configfiles || notify-fail "Could not cd to ~/.configfiles"
 }
 
 define "source-config" "Reloads the zsh config"
 source-config() {
   exec zsh
 }
-
 alias refresh=source-config
-
-define "cert-issue" "Checks to see if a site has a valid SSL cert"
-cert-issue() {
-  echo | openssl s_client -servername $1 -connect $1:443 2>/dev/null | openssl x509 -noout -issuer
-}
-
-define "cert-info" "Checks to get info on a cert"
-cert-info() {
-  echo | openssl s_client -servername $1 -connect $1:443 2>/dev/null | openssl x509 -noout -text
-}
 
 define "config-help" "Shows these help docs"
 config-help() {

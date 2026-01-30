@@ -3,21 +3,32 @@
 cd "$(dirname "$0")" || exit 1
 
 to_install=(
-  # oh-my-posh
   atuin
   coreutils
   eza
-  ffmpeg
   fileicon
   git-delta
   mise
   starship
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  # oh-my-posh
+)
+
+optional_to_install=(
+  ffmpeg
 )
 
 echo -e "GREETINGS!\n\nThis install has two steps: \033[35m1.) Install Homebrew packages\033[0m, and \033[36m2.) Link dotfiles\033[0m.\n"
-echo -e "Step 1: Install Homebrew packages\n"
+echo -e "Step 1: Install \"required\" Homebrew packages\n"
 echo -e "The following packages will be installed:\n"
 for package in "${to_install[@]}"; do
+  echo -e "\t - 📦 $package"
+done
+
+echo -e "Step 2: Install \"optional\" Homebrew packages\n"
+echo -e "The following packages will be installed:\n"
+for package in "${optional_to_install[@]}"; do
   echo -e "\t - 📦 $package"
 done
 
@@ -45,7 +56,10 @@ files_to_link=(
   .tool-versions
   .gitconfig
   .gitignore_global
+  .vimrc
   .zshrc
+  .netrc
+  # .p10k.zsh
 )
 echo -e "\nStep 2: Link dotfiles\n"
 echo -e "The following files will be linked to your home directory:\n"

@@ -1,0 +1,5 @@
+# Treat scripts as bash (shellcheck doesn't support zsh directly)
+shell=bash
+
+# Ignore missing shebang warning, this is zsh
+disable=SC2148
