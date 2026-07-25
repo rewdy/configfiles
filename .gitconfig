@@ -1,10 +1,8 @@
 [user]
     name = Andrew Meyer
-    email = andrewmeyer@granular.ag
+    email = andrew@rewdy.com
 [push]
     followTags = true
-[init]
-    defaultBranch = master
 [alias]
     am = add --all && commit
     revert-to = diff HEAD $1 | git apply
