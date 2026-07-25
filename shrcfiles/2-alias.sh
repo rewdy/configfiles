@@ -42,7 +42,8 @@ alias y="yarn"
 alias gui="gitui"
 
 # App aliases
-alias edit="code"
+alias edit="zed"
+alias code="zed"
 
 # Clear DNS cache
 alias cleardnscache="sudo killall -HUP mDNSResponder"
