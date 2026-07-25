@@ -81,11 +81,6 @@ toggle-dark() {
   osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'
 }
 
-define "newtab" "Tells iTerm to create a new tab"
-newtab() {
-  osascript -e 'tell application "iTerm" to activate' -e 'tell application "System Events" to tell process "iTerm" to keystroke "t" using command down'
-}
-
 define "toggle-stage-manager" "Turns on or off MacOS Stage Manager"
 toggle-stage-manager() {
   enabled=$(defaults read com.apple.WindowManager GloballyEnabled)
@@ -117,13 +112,6 @@ code-repo() {
 }
 define "coder" "alias for code-repo"
 alias coder=code-repo
-
-define "py-path" "Sets the PYTHONPATH env var to the current path"
-py-path() {
-  current=$(pwd)
-  export PYTHONPATH=$current
-  notify "PYTHONPATH is now ${PYTHONPATH}"
-}
 
 define "port-check" "Checks what is running on a specified port"
 function port-check() {
@@ -191,8 +179,8 @@ bonvoyage() {
   notify "🎗 Reminder: Before running browsersync, be sure to update the proxy setting in Gruntfile.js."
 }
 
-define "movtomp4" "Creates an .mp4 file from a .mov file"
-movtomp4() {
+define "mov-to-mp4" "Creates an .mp4 file from a .mov file"
+mov-to-mp4() {
   ending='.mp4'
   if [ -z ${2+x} ]; then
     output=${1:0:-4}
@@ -205,8 +193,8 @@ movtomp4() {
 }
 
 # Make a mp4 from a mov
-define "movtogif" "Creates an .gif file from a .mov file"
-movtogif() {
+define "mov-to-gif" "Creates an .gif file from a .mov file"
+mov-to-gif() {
   ending='.gif'
   scale=640
   if [ -z ${2+x} ]; then
@@ -262,29 +250,6 @@ make-nerd-font() {
     notify-fail "Please provide a path to a directory containing .ttf files!"
     return 1
   fi
-}
-
-define "vscode-colors" "Creates a .vscode settings file and sets the window bar to a random color (or you can pass a hex color code of your choice)"
-vscode-colors() {
-  if [ -z "$1" ]; then
-    color="#$(openssl rand -hex 3)"
-  else
-    color="$1"
-  fi
-  if [ ! -f .vscode/settings.json ]; then
-    mkdir -p .vscode
-    cat <<EOT >>./.vscode/settings.json
-{
-  "workbench.colorCustomizations": {
-    "titleBar.activeBackground": "$color",
-    "titleBar.activeForeground": "#f2f2f2"
-  }
-}
-EOT
-  else
-    jq --arg color "$color" '."workbench.colorCustomizations"."titleBar.activeBackground" = $color | ."workbench.colorCustomizations"."titleBar.activeForeground" = "#f2f2f2"' .vscode/settings.json >.vscode/tmp_settings.json && mv .vscode/tmp_settings.json .vscode/settings.json
-  fi
-  notify-success "VSCode Settings Created."
 }
 
 define "cdo" "cds to the directory and opens it in vscode"
@@ -366,6 +331,74 @@ EOF
 define "ace" "Alias for add-changelog-entry"
 alias ace=add-changelog-entry
 
+define "run-with-timer" "Runs a command and shows a ticking timer while it's running. Usage: run-with-timer <command>"
+run-with-timer() {
+  if [ -z "$1" ]; then
+    notify-fail "Please provide a command to run."
+    return 1
+  fi
+
+  notify-start "Running command: $*"
+  start_time=$(date +%s)
+
+  # Start the command in the background
+  "$@" &
+  cmd_pid=$!
+
+  # Start a timer
+  (
+    while kill -0 $cmd_pid 2>/dev/null; do
+      elapsed=$(( $(date +%s) - start_time ))
+      printf "\r🕑 Elapsed time: %02d:%02d" $((elapsed / 60)) $((elapsed % 60))
+      sleep 1
+    done
+  ) &
+  timer_pid=$!
+  # Wait for the command to finish
+  wait $cmd_pid
+
+  # Kill the timer
+  kill $timer_pid 2>/dev/null
+
+  end_time=$(date +%s)
+  total_time=$((end_time - start_time))
+
+  echo ""
+  notify-success "Command completed in $total_time seconds."
+}
+
+define "scad-to-stl" "Converts a .scad file to .stl using OpenSCAD"
+scad-to-stl() {
+  if [ -z "$1" ]; then
+    echo "Usage: scad-to-stl <file.scad> [output.stl]"
+    return 1
+  fi
+
+  if [[ "$1" != *.scad ]]; then
+    notify-fail "Input file must have .scad extension"
+    return 1
+  fi
+
+  output="${2:-${1%.scad}.stl}"
+
+  # Check if output has an extension
+  if [[ "$output" == *.* ]]; then
+    # Has extension, check if it's .stl
+    if [[ "$output" != *.stl ]]; then
+      echo "Error: Output file must have .stl extension"
+      return 1
+    fi
+  else
+    # No extension, add .stl
+    output="${output}.stl"
+  fi
+
+  notify-start "Converting $1 to $output..."
+  openscad --export-format binstl -o "$output" "$1"
+  echo ""
+  notify-success "Conversion complete: $output"
+}
+
 #
 # Node utils
 #
@@ -377,39 +410,6 @@ node-project-copy() {
 }
 define "ncp" "alias of node-project-copy"
 alias ncp="node-project-copy"
-
-define "yarn-clean-reinstall" "Removes node_modules and yarn.lock then reinstalls dependencies"
-yarn-clean-reinstall() {
-  notify-start "🧹 Removing node_modules and yarn.lock, reinstalling"
-  rm -rf node_modules yarn.lock
-  yarn install
-  notify-success "🎉 Done."
-}
-define "ycri" "alias of yarn-clean-reinstall"
-alias ycri=yarn-clean-reinstall
-
-define "yarn-add-resolution" "Adds a resolution to package.json, yarn style."
-yarn-add-resolution() {
-  if [ "$#" -eq 0 ]; then
-    notify-fail "Please provide at least one package name and version in the format package@version"
-    return 1
-  fi
-
-  notify-start "🔏 Adding resolutions to package.json"
-
-  for pkg in "$@"; do
-    if [[ "$pkg" != *@* ]]; then
-      notify-fail "Invalid format for $pkg. Please provide in the format package@version"
-      return 1
-    fi
-
-    package_name="${pkg%@*}"
-    version="${pkg#*@}"
-    jq --arg pkg "$package_name" --arg ver "$version" '.resolutions[$pkg] = $ver' package.json >tmp.$$.json && mv tmp.$$.json package.json
-  done
-
-  notify-success "🎉 Done."
-}
 
 #
 # Colors
