@@ -1,29 +1,17 @@
-# NOTE: I've removed most of the comments here. To see the original default .zshrc take a
-# peek here: https://github.com/ohmyzsh/ohmyzsh/blob/master/templates/zshrc.zsh-template
-# zmodload zsh/zprof
+#
+# Super lite .zshrc file I created after reading:
+# https://rushter.com/blog/zsh-shell/
+#
 
 echo "⏳ Loading..."
 # source files in the shrcfiles folder alphabetically
 config_start=$(($(gdate +%s%N) / 1000000))
 
-# Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
+export HISTSIZE=500000
+export SAVEHIST=$HISTSIZE
 
-ZSH_THEME=""
-COMPLETION_WAITING_DOTS="true"
-
-# Plugins
-plugins=(
-  macos
-  git
-  mise
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  z
-  dotenv
-)
-
-source $ZSH/oh-my-zsh.sh
+setopt EXTENDED_HISTORY
+setopt autocd
 
 ############################################################
 # USER CONFIG
@@ -40,12 +28,21 @@ eval "$(starship init zsh)"
 # Spin up atuin
 eval "$(atuin init zsh)"
 
-############################################################
-# Configure bash style completions
-############################################################
+# Sets up the z command https://github.com/agkozak/zsh-z
+source "$HOME/.configfiles/zsh-z/zsh-z.plugin.zsh"
 
-autoload -U +X compinit && compinit
-autoload -U +X bashcompinit && bashcompinit
+# Syntax highlighting
+# shellcheck disable=SC2046
+source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Auto suggestions (we're going to use async)
+export ZSH_AUTOSUGGEST_USE_ASYNC=1
+export ZSH_AUTOSUGGEST_STRATEGY=(history)
+# shellcheck disable=SC2046
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# Enable mise!
+eval "$(mise activate zsh)"
 
 ############################################################
 # Load additional config files
@@ -57,29 +54,26 @@ if [ -f "$HOME/.private-config.sh" ]; then
   source "$HOME/.private-config.sh"
 fi
 
-for f in $(ls -v ~/.configfiles/shrcfiles/*.sh); do
-  # timer=$(($(gdate +%s%N)/1000000))
-  source $f
-  # now=$(($(gdate +%s%N)/1000000))
-  # elapsed=$(($now-$timer))
-  # echo $elapsed":" $f
+for f in ~/.configfiles/shrcfiles/*.sh; do
+  # shellcheck disable=SC1090
+  source "$f"
 done
 
-config_end=$(($(gdate +%s%N) / 1000000))
-config_elapsed=$(($config_end - $config_start))
-
-elapsed=$(colorize-time $config_elapsed)
-
-# This is the last thing that runs. This Replaces any output that happens during
-# start up with the ready indicator.
-echo -e "\033c$(emoji) Let's go! $elapsed"
-
-# zprof
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/andrew.meyer/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
 # End of Docker CLI completions
 
-# Added by Antigravity
-export PATH="/Users/andrew.meyer/.antigravity/antigravity/bin:$PATH"
+# Completion settings (must be before compinit)
+zstyle ':completion:*' menu select
+
+# Run once at the end
+autoload -Uz compinit; compinit
+
+############################################################
+# This is the last thing that runs. This Replaces any output that happens during
+# start up with the ready indicator.
+config_end=$(($(gdate +%s%N) / 1000000))
+config_elapsed=$(($config_end - $config_start))
+elapsed=$(colorize-time $config_elapsed)
+
+echo -e "\033c$(emoji) Let's go! $elapsed"
