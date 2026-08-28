@@ -13,13 +13,14 @@ export SAVEHIST=$HISTSIZE
 setopt EXTENDED_HISTORY
 setopt autocd
 
+typeset -U path PATH
+
+# Sauce go binaries
+export PATH="$HOME/go/bin:$PATH"
+
 ############################################################
 # USER CONFIG
 ############################################################
-
-# 💅 Oh my posh
-# posh_config="~/.configfiles/oh-my-posh-config.yml"
-# eval "$(oh-my-posh init zsh --config $posh_config)"
 
 # 🚀✨ Starship
 export STARSHIP_CONFIG=~/.configfiles/starship.toml
@@ -43,6 +44,9 @@ source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Enable mise!
 eval "$(mise activate zsh)"
+
+# Enable worktree
+eval "$(worktree-bin shell-init)"
 
 ############################################################
 # Load additional config files
@@ -77,3 +81,9 @@ config_elapsed=$(($config_end - $config_start))
 elapsed=$(colorize-time $config_elapsed)
 
 echo -e "\033c$(emoji) Let's go! $elapsed"
+
+# remind-cli hook - This takes about 500ms and isn't configuring the
+# shell at all, so putting here after we echo out we're ready.
+if [[ $SHLVL -eq 1 && $- == *i* ]]; then
+  remind check
+fi

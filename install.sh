@@ -20,6 +20,9 @@ to_install=(
 
 optional_to_install=(
   ffmpeg
+  glow
+  # simoarpe/ziggity/ziggity -- update so i can do this. install manually.
+  uv
 )
 
 echo -e "GREETINGS!\n\nThis install has two steps: \033[35m1.) Install Homebrew packages\033[0m, and \033[36m2.) Link dotfiles\033[0m.\n"

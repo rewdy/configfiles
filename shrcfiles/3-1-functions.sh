@@ -98,6 +98,20 @@ toggle-stage-manager() {
   notify-success "Done."
 }
 
+define "cd-repo" "Changes directory to the root of the current git repo"
+cd-repo() {
+  # Check if we're in a git repo
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1
+  then
+    # Get the root of the git repo
+    repo_root=$(git rev-parse --show-toplevel)
+    cd "$repo_root" || notify-fail "Could not cd to $repo_root"
+  else
+    notify-fail "Not inside a git repository"
+  fi
+}
+alias cdr=cd-repo
+
 define "code-repo" "Opens the root of the current git repo in VSCode"
 code-repo() {
   # Check if we're in a git repo
@@ -116,17 +130,6 @@ alias coder=code-repo
 define "port-check" "Checks what is running on a specified port"
 function port-check() {
   lsof -n -i :"$1"
-}
-
-define "spyware-log" "Logs all the spyware runners on machine"
-spyware-log() {
-  logfile="$HOME/spyware.txt"
-  rm "$logfile"
-  while true; do
-    echo "$(date)" >>logfile.txt
-    ps -eo pcpu,pid,user,args | ggrep -iP 'cyber|zscaler|falcon|lakeside|upm|tanium|wdavd' | ggrep -vP '0\.0' | grep -v "$USER" >>"$logfile"
-    sleep 3
-  done
 }
 
 # This kills everything on a port
@@ -159,25 +162,6 @@ cert-info() {
 #
 # Scripts (basically)
 #
-
-define "bonvoyage" "Create a new bon voyage static website project" "https://github.com/rewdy/bonvoyage"
-bonvoyage() {
-  notify-start "Bon voyage 🛳️"
-  git clone https://github.com/rewdy/bonvoyage.git $1
-  if [ -z ${1+x} ]; then
-    cd bonvoyage || exit 1
-  else
-    cd "$1" || exit 1
-  fi
-  notify 'Installing node modules...'
-  npm install
-  rm -rf .git
-  notify-success 'Removed git reference.'
-  rm readme.md
-  notify-success 'Removed readme file.'
-  notify-success 'Done.'
-  notify "🎗 Reminder: Before running browsersync, be sure to update the proxy setting in Gruntfile.js."
-}
 
 define "mov-to-mp4" "Creates an .mp4 file from a .mov file"
 mov-to-mp4() {
@@ -254,82 +238,9 @@ make-nerd-font() {
 
 define "cdo" "cds to the directory and opens it in vscode"
 cdo() {
-  z "$1" || cd "$1" || exit 1
-  code .
+  z "$1" || cd "$1" || return 1
+  "$EDITOR_TOOL" .
 }
-
-define "add-changelog-entry" "Adds a changelog entry to CHANGELOG.md"
-add-changelog-entry() {
-  # Parse flags
-  local commit_flag=false
-  local entry_text=""
-
-  while [[ $# -gt 0 ]]; do
-    case $1 in
-      -c|--commit)
-        commit_flag=true
-        shift
-        ;;
-      *)
-        entry_text="$1"
-        shift
-        ;;
-    esac
-  done
-
-  # Check for entry argument
-  if [ -z "$entry_text" ]; then
-    notify-fail "Please provide a changelog entry!"
-    return 1
-  fi
-  potential_changelog_files=("CHANGELOG.md" "API_CLIENT_CHANGELOG.md")
-  # Check for changelog file
-  local changelog_file=""
-  for file in "${potential_changelog_files[@]}"; do
-    if [ -f "$file" ]; then
-      changelog_file="$file"
-      break
-    fi
-  done
-
-  if [ -z "$changelog_file" ]; then
-    notify-fail "No changelog file found in current directory! Looked for: ${potential_changelog_files[*]}"
-    return 1
-  fi
-
-  # Determine next version
-  current_highest_version=$(grep -Eo '## \[[0-9]+\.[0-9]+\.[0-9]+' "$changelog_file" | head -1 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
-  if [ -z "$current_highest_version" ]; then
-    notify-fail "Could not determine current highest version from $changelog_file!"
-    return 1
-  fi
-  echo ""  # blank line
-  new_version=$(echo $current_highest_version | awk -F. -v OFS=. '{$3++;print}')
-  notify "Will update: \033[37m$current_highest_version -> $new_version\033[0m"
-  read -r -d '' entry << EOF
-## [$new_version] - $(date "+%Y-%m-%d")
-
-- $entry_text
-EOF
-
-  echo -e "\nAdding entry:"
-  echo -e "\033[33m\n...\n$entry\n...\n\033[0m"
-
-  # Insert entry after the ## [Unreleased] line
-  sed -i.bak "/## \[Unreleased\]/r /dev/stdin" "$changelog_file" <<<$'\n'"$entry"
-  rm "${changelog_file}.bak"
-  notify-success "Changelog updated."
-
-  # Commit if flag is set
-  if [ "$commit_flag" = true ]; then
-    git add "$changelog_file"
-    git commit -m "Added changelog entry"
-    notify-success "Committed changelog entry."
-  fi
-}
-
-define "ace" "Alias for add-changelog-entry"
-alias ace=add-changelog-entry
 
 define "run-with-timer" "Runs a command and shows a ticking timer while it's running. Usage: run-with-timer <command>"
 run-with-timer() {

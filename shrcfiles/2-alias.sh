@@ -23,31 +23,36 @@ alias work='cd ~/Workspace' # Go to work directory
 alias cp='cp -Rv'           # Preferred 'cp' implementation: recursive, interactive, verbose
 alias untar="tar -zxvf"     # Shortcut for untarring
 
-cd() {
-  builtin cd "$@" || return 1;
-  eza -hl --git
-} # List directory contents upon 'cd'
+# List directory contents whenever the working directory changes
+autoload -Uz add-zsh-hook
+chpwd_list_files() {
+  if (( $+commands[eza] )); then
+    eza -hl --git
+  else
+    ls -lah
+  fi
+}
+add-zsh-hook chpwd chpwd_list_files
 
 # Git Shorties
 alias gs='git status' # Git Shorties
 alias gaac="git add --all && git commit"
 alias grc="git rebase --continue"
+alias gg="ziggity"
 
 # Short version of other commands
 alias docc="docker compose"
 alias tf="terraform"
 alias p="pnpm"
 alias p-id="pnpm install && pnpm dev"
-alias y="yarn"
-alias gui="gitui"
+alias gui="ziggity"
 
-# App aliases
-alias edit="zed"
-alias code="zed"
+# Edit stuff
+alias code="$EDITOR_TOOL"
+alias edit="$EDITOR_TOOL"
+alias wt="worktree"
+
+alias pwdcp="pwd | pbcopy"
 
 # Clear DNS cache
 alias cleardnscache="sudo killall -HUP mDNSResponder"
-
-# GH Copilot
-alias ghs="gh copilot suggest"
-alias ghe="gh copilot explain"
