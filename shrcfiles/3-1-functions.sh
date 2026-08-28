@@ -359,8 +359,8 @@ define "colorize-time" "Colorizes the time output; higher times are bolder"
 colorize-time() {
   local time=$1
   if [ $time -lt 1000 ]; then
-    # show is gray b/c it's good and doesn't need attention.
-    echo -e "\e[1;30m($time ms)\033[0m"
+    # Use a dimmed default foreground so it adapts to light and dark themes.
+    printf '\e[2;39m(%d ms)\e[0m\n' "$time"
   elif [ $time -le 3000 ]; then
     # show in yellow
     echo -e "\033[33m($time ms)\033[0m"
