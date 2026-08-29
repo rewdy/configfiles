@@ -15,14 +15,15 @@ to_install=(
   starship
   zsh-autosuggestions
   zsh-syntax-highlighting
-  # oh-my-posh
 )
 
 optional_to_install=(
+  awscli
   ffmpeg
   glow
-  # simoarpe/ziggity/ziggity -- update so i can do this. install manually.
   uv
+  simoarpe/ziggity/ziggity
+  charmbracelet/tap/crush
 )
 
 echo -e "GREETINGS!\n\nThis install has two steps: \033[35m1.) Install Homebrew packages\033[0m, and \033[36m2.) Link dotfiles\033[0m.\n"
@@ -62,7 +63,10 @@ elif [ "$install" = "n" ]; then
 fi
 
 for package in "${to_install[@]}"; do
-  if ! brew list --formula | grep -q "^$package\$"; then
+  # `brew list --formula` reports the short formula name, even when the
+  # package was installed using a namespaced spec such as owner/tap/formula.
+  formula_name="${package##*/}"
+  if ! brew list --formula "$formula_name" >/dev/null 2>&1; then
     echo "Installing $package..."
     brew install "$package"
   else
